@@ -1,89 +1,78 @@
-/** biome-ignore-all lint/style/useDefaultSwitchClause: <explanatio> */
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import { GlobeIcon, MicIcon } from 'lucide-react';
 import { useState } from 'react';
 import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from '@/components/ai-elements/conversation';
+import { Message, MessageContent } from '@/components/ai-elements/message';
+import {
   PromptInput,
-  PromptInputButton,
-  PromptInputModelSelect,
-  PromptInputModelSelectContent,
-  PromptInputModelSelectItem,
-  PromptInputModelSelectTrigger,
-  PromptInputModelSelectValue,
   PromptInputSubmit,
   PromptInputTextarea,
-  PromptInputToolbar,
-  PromptInputTools,
 } from '@/components/ai-elements/prompt-input';
+import { Response } from '@/components/ai-elements/response';
 
-const models = [
-  { id: 'gpt-4o', name: 'GPT-4o' },
-  { id: 'claude-opus-4-20250514', name: 'Claude 4 Opus' },
-];
-export default function Chat() {
-  const [model, setModel] = useState<string>(models[0].id);
+const Chat = () => {
   const [input, setInput] = useState('');
-  const { messages, status, sendMessage } = useChat();
+  const { messages, sendMessage, status } = useChat();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim()) {
+      sendMessage({ text: input });
+      setInput('');
+    }
+  };
+
   return (
-    <div className='stretch mx-auto flex w-full max-w-md flex-col py-24'>
-      {messages.map((message) => (
-        <div className='whitespace-pre-wrap' key={message.id}>
-          {message.role === 'user' ? 'User: ' : 'AI: '}
-          {message.parts.map((part, i) => {
-            switch (part.type) {
-              case 'text':
-                return <div key={`${message.id}-${i}`}>{part.text}</div>;
-            }
-          })}
-        </div>
-      ))}
-      <PromptInput
-        className='mt-4'
-        onSubmit={(e) => {
-          e.preventDefault();
-          sendMessage({ text: input });
-          setInput('');
-        }}
-      >
-        <PromptInputTextarea
-          onChange={(e) => setInput(e.currentTarget.value)}
-          value={input}
-        />
-        <PromptInputToolbar>
-          <PromptInputTools>
-            <PromptInputButton>
-              <MicIcon size={16} />
-            </PromptInputButton>
-            <PromptInputButton>
-              <GlobeIcon size={16} />
-              <span>Search</span>
-            </PromptInputButton>
-            <PromptInputModelSelect
-              onValueChange={(value) => {
-                setModel(value);
-              }}
-              value={model}
-            >
-              <PromptInputModelSelectTrigger>
-                <PromptInputModelSelectValue />
-              </PromptInputModelSelectTrigger>
-              <PromptInputModelSelectContent>
-                {models.map((model) => (
-                  <PromptInputModelSelectItem key={model.id} value={model.id}>
-                    {model.name}
-                  </PromptInputModelSelectItem>
-                ))}
-              </PromptInputModelSelectContent>
-            </PromptInputModelSelect>
-          </PromptInputTools>
-          <PromptInputSubmit
-            disabled={status === 'streaming' || !messages.length}
-            status={status}
+    <div className='relative mx-auto size-full h-screen max-w-4xl rounded-lg p-6'>
+      <div className='flex h-full flex-col'>
+        <Conversation>
+          <ConversationContent>
+            {messages.map((message) => (
+              <Message from={message.role} key={message.id}>
+                <MessageContent>
+                  {message.parts.map((part, i) => {
+                    switch (part.type) {
+                      case 'text': // we don't use any reasoning or tool calls in this example
+                        return (
+                          <Response key={`${message.id}-${i}`}>
+                            {part.text}
+                          </Response>
+                        );
+                      default:
+                        return null;
+                    }
+                  })}
+                </MessageContent>
+              </Message>
+            ))}
+          </ConversationContent>
+          <ConversationScrollButton />
+        </Conversation>
+
+        <PromptInput
+          className='relative mx-auto mt-4 w-full max-w-2xl'
+          onSubmit={handleSubmit}
+        >
+          <PromptInputTextarea
+            className='pr-12'
+            onChange={(e) => setInput(e.currentTarget.value)}
+            placeholder='Say something...'
+            value={input}
           />
-        </PromptInputToolbar>
-      </PromptInput>
+          <PromptInputSubmit
+            className='absolute right-1 bottom-1'
+            disabled={!input.trim()}
+            status={status === 'streaming' ? 'streaming' : 'ready'}
+          />
+        </PromptInput>
+      </div>
     </div>
   );
-}
+};
+
+export default Chat;
