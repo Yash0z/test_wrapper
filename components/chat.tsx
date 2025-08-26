@@ -3,6 +3,12 @@
 
 import { useChat } from '@ai-sdk/react';
 import { useState } from 'react';
+import {
+  PromptInput,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  PromptInputToolbar,
+} from '@/components/ai-elements/prompt-input';
 
 export default function Chat() {
   const [input, setInput] = useState('');
@@ -20,21 +26,26 @@ export default function Chat() {
           })}
         </div>
       ))}
-
-      <form
+      <PromptInput
+        className='relative mt-4'
         onSubmit={(e) => {
           e.preventDefault();
           sendMessage({ text: input });
           setInput('');
         }}
       >
-        <input
-          className='fixed bottom-0 mb-8 w-full max-w-md rounded border border-zinc-300 p-2 shadow-xl dark:border-zinc-800 dark:bg-zinc-900'
+        <PromptInputTextarea
           onChange={(e) => setInput(e.currentTarget.value)}
-          placeholder='Say something...'
           value={input}
         />
-      </form>
+        <PromptInputToolbar>
+          <PromptInputSubmit
+            className='absolute right-1 bottom-1'
+            disabled={false}
+            status={'ready'}
+          />
+        </PromptInputToolbar>
+      </PromptInput>
     </div>
   );
 }
