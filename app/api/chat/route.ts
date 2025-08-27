@@ -1,5 +1,5 @@
-import { openai } from '@ai-sdk/openai';
 import { convertToModelMessages, streamText, type UIMessage } from 'ai';
+import { openai } from '@/components/providers/sdk_providers';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
