@@ -15,13 +15,21 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useApiKey } from '@/store/apiKeyStore';
 
 const providers = ['OpenAI', 'Azure', 'Anthropic'] as const;
 
 export default function API_KeyInput() {
   const id = useId();
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
-
+  const setKey = useApiKey((state) => state.setKey);
+  const handleSubmit = () => {
+    for (const [provider, key] of Object.entries(inputValues)) {
+      if (key) {
+        setKey(provider, key);
+      }
+    }
+  };
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -73,7 +81,12 @@ export default function API_KeyInput() {
                 Cancel
               </Button>
             </DialogClose>
-            <Button className='flex-1' type='button' variant='secondary'>
+            <Button
+              className='flex-1'
+              onClick={handleSubmit}
+              type='button'
+              variant='secondary'
+            >
               Add
             </Button>
           </DialogFooter>
