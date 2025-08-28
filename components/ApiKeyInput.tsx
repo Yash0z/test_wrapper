@@ -28,6 +28,7 @@ export default function API_KeyInput() {
       if (key) {
         setKey(provider, key);
       }
+      console.log(useApiKey.getState().keys);
     }
   };
   return (
