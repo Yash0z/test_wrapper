@@ -1,8 +1,8 @@
 'use client';
 
+import { DialogDescription } from '@radix-ui/react-dialog';
 import { KeyRound } from 'lucide-react';
 import { useId, useState } from 'react';
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -25,7 +25,7 @@ export default function API_KeyInput() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant='outline'>ADD API KEY</Button>
+        <Button variant='outline'>API KEy</Button>
       </DialogTrigger>
       <DialogContent>
         <div className='flex flex-col items-center gap-2'>
@@ -39,9 +39,11 @@ export default function API_KeyInput() {
             <DialogTitle className='sm:text-center'>
               API Key Required
             </DialogTitle>
+            <DialogDescription>
+              enter your API key for the providers you wish to use.
+            </DialogDescription>
           </DialogHeader>
         </div>
-
         <form className='space-y-5'>
           <div className='*:not-first:mt-2'>
             {providers.map((provider) => (
